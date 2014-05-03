@@ -4,15 +4,15 @@ describe 'Sliver' do
   include Rack::Test::Methods
 
   let(:app) { Sliver::API.new do |api|
-    api.get '/', lambda { |environment|
+    api.connect :get, '/', lambda { |environment|
       [200, {'Content-Type' => 'text/plain'}, ['foo']]
     }
 
-    api.get '/bar', lambda { |environment|
+    api.connect :get, '/bar', lambda { |environment|
       [200, {'Content-Type' => 'text/plain'}, ['baz']]
     }
 
-    api.post '/', lambda { |environment|
+    api.connect :post, '/', lambda { |environment|
       [200, {'Content-Type' => 'text/plain'}, ['qux']]
     }
   end }

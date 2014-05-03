@@ -30,12 +30,12 @@ app = Sliver::API.new do |api|
   api.version = 'v1'
 
   # GET /v1/
-  api.get '/', lambda { |environment|
+  api.connect :get, '/', lambda { |environment|
     [200, {}, ['How dare the Premier ignore my invitations?']]
   }
 
   # PUT /v1/change
-  api.put '/change', ChangeAction
+  api.connect :put, '/change', ChangeAction
 end
 
 class ChangeAction
