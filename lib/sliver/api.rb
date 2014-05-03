@@ -4,7 +4,7 @@ class Sliver::API
   attr_accessor :path
 
   def initialize(&block)
-    @endpoints = {}
+    @endpoints = Hash.new { |hash, key| hash[key] = Sliver::Endpoints.new }
     @path      = ''
 
     block.call self
@@ -13,7 +13,7 @@ class Sliver::API
   def call(environment)
     method    = environment['REQUEST_METHOD']
     path_info = environment['PATH_INFO'].gsub(/\A#{path}/, '')
-    endpoint  = endpoints.fetch(method, {}).fetch(path_info, NOT_FOUND)
+    endpoint  = endpoints[method].find(path_info) || NOT_FOUND
 
     endpoint.call environment
   end
@@ -21,8 +21,7 @@ class Sliver::API
   def connect(method, path, action)
     method = method.to_s.upcase
 
-    endpoints[method]     ||= {}
-    endpoints[method][path] = action
+    endpoints[method].append path, action
   end
 
   private
