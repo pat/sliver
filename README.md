@@ -52,7 +52,7 @@ class ChangeAction
     response.body = [
       "How dare the Premier ignore my invitations?",
       "He'll have to go",
-      "So, to the bunch he luncheons with",
+      "So too the bunch he luncheons with",
       "It's second on my list of things to do"
     ]
 
