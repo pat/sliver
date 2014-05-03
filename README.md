@@ -2,6 +2,8 @@
 
 A super simple, extendable Rack API.
 
+Early days of development, so things may change dramatically. Or not. Who knows.
+
 ## Installation
 
 Add it to your Gemfile like any other gem, or install it manually.
