@@ -1,14 +1,17 @@
 class Sliver::API
+  attr_accessor :path
+
   def initialize(&block)
     @endpoints = {}
+    @path      = ''
 
     block.call self
   end
 
   def call(environment)
-    method   = environment['REQUEST_METHOD']
-    path     = environment['PATH_INFO']
-    endpoint = endpoints[method][path]
+    method    = environment['REQUEST_METHOD']
+    path_info = environment['PATH_INFO'].gsub(/\A#{path}/, '')
+    endpoint  = endpoints[method][path_info]
 
     endpoint.call environment
   end

@@ -37,3 +37,21 @@ describe 'Basic Sliver API' do
     expect(last_response.body).to eq('qux')
   end
 end
+
+describe 'Basic lambda API with a path prefix' do
+  include Rack::Test::Methods
+
+  let(:app) { Sliver::API.new do |api|
+    api.path = '/v1'
+
+    api.connect :get, '/', lambda { |environment|
+      [200, {'Content-Type' => 'text/plain'}, ['foo']]
+    }
+  end }
+
+  it 'responds to GET requests' do
+    get '/v1/'
+
+    expect(last_response.body).to eq('foo')
+  end
+end

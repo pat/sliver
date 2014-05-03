@@ -26,8 +26,8 @@ the standard Rack response. Each instance of a class that mixes in
 
 ```ruby
 app = Sliver::API.new do |api|
-  # All API endpoints are namespaced by a version.
-  api.version = 'v1'
+  #Endpoints can be namespaced by a path - for example, a version.
+  api.path = '/v1'
 
   # GET /v1/
   api.connect :get, '/', lambda { |environment|
