@@ -13,7 +13,7 @@ class Sliver::API
     path_info = environment['PATH_INFO'].gsub(/\A#{path}/, '')
     endpoint  = endpoints[method][path_info]
 
-    endpoint.call environment
+    endpoint ? endpoint.call(environment) : [404, {}, ['Not Found']]
   end
 
   def connect(method, path, action)

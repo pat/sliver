@@ -36,6 +36,13 @@ describe 'Basic Sliver API' do
 
     expect(last_response.body).to eq('qux')
   end
+
+  it 'responds to unknown endpoints with a 404' do
+    get '/missing'
+
+    expect(last_response.status).to eq(404)
+    expect(last_response.body).to eq('Not Found')
+  end
 end
 
 describe 'Basic lambda API with a path prefix' do
