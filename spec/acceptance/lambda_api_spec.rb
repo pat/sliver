@@ -15,6 +15,10 @@ describe 'Basic Sliver API' do
     api.connect :post, '/', lambda { |environment|
       [200, {'Content-Type' => 'text/plain'}, ['qux']]
     }
+
+    api.connect :delete, %r{/remove/\d+}, lambda { |environment|
+      [200, {}, ['removed']]
+    }
   end }
 
   it 'responds to GET requests' do
@@ -42,6 +46,13 @@ describe 'Basic Sliver API' do
 
     expect(last_response.status).to eq(404)
     expect(last_response.body).to eq('Not Found')
+  end
+
+  it 'matches against regular expressions' do
+    delete '/remove/141'
+
+    expect(last_response.status).to eq(200)
+    expect(last_response.body).to eq('removed')
   end
 end
 
