@@ -11,6 +11,10 @@ describe 'Sliver' do
     api.get '/bar', lambda { |environment|
       [200, {'Content-Type' => 'text/plain'}, ['baz']]
     }
+
+    api.post '/', lambda { |environment|
+      [200, {'Content-Type' => 'text/plain'}, ['qux']]
+    }
   end }
 
   it 'responds to GET requests' do
@@ -25,5 +29,11 @@ describe 'Sliver' do
     get '/bar'
 
     expect(last_response.body).to eq('baz')
+  end
+
+  it 'responds to POST requests' do
+    post '/'
+
+    expect(last_response.body).to eq('qux')
   end
 end

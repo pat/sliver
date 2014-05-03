@@ -1,4 +1,5 @@
 class Sliver::API
+  HTTP_METHODS = %w( OPTIONS GET HEAD POST PUT DELETE TRACE CONNECT PATCH )
   def initialize(&block)
     @endpoints = {}
 
@@ -13,9 +14,11 @@ class Sliver::API
     endpoint.call environment
   end
 
-  def get(path, action)
-    endpoints['GET']     ||= {}
-    endpoints['GET'][path] = action
+  HTTP_METHODS.each do |method|
+    define_method method.downcase.to_sym do |path, action|
+      endpoints[method]     ||= {}
+      endpoints[method][path] = action
+    end
   end
 
   private
