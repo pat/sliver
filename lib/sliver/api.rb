@@ -11,9 +11,9 @@ class Sliver::API
   def call(environment)
     method    = environment['REQUEST_METHOD']
     path_info = environment['PATH_INFO'].gsub(/\A#{path}/, '')
-    endpoint  = endpoints[method][path_info]
+    endpoint  = endpoints.fetch(method, {}).fetch(path_info, not_found)
 
-    endpoint ? endpoint.call(environment) : [404, {}, ['Not Found']]
+    endpoint.call environment
   end
 
   def connect(method, path, action)
@@ -26,4 +26,8 @@ class Sliver::API
   private
 
   attr_reader :endpoints
+
+  def not_found
+    @not_found ||= lambda { |environment| [404, {}, ['Not Found']] }
+  end
 end
