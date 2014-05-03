@@ -2,6 +2,8 @@
 
 A super simple, extendable Rack API.
 
+[![Build Status](https://travis-ci.org/pat/sliver.svg?branch=master)](https://travis-ci.org/pat/sliver)
+
 Early days of development, so things may change dramatically. Or not. Who knows.
 
 ## Installation
