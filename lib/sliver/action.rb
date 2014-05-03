@@ -19,4 +19,8 @@ module Sliver::Action
   private
 
   attr_reader :environment, :response
+
+  def request
+    @request ||= Rack::Request.new environment
+  end
 end
