@@ -4,7 +4,7 @@ A super simple, extendable Rack API.
 
 ## Installation
 
-Add it to your Gemfile like any other gem, or install it manually yourself.
+Add it to your Gemfile like any other gem, or install it manually.
 
 ```ruby
 gem 'sliver', '~> 0.0.1'
@@ -96,3 +96,8 @@ end
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
+
+## Licence
+
+Copyright (c) 2014, Sliver is developed and maintained by Pat Allan, and is
+released under the open MIT Licence.
