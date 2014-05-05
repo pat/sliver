@@ -30,9 +30,6 @@ the standard Rack response. Each instance of a class that mixes in
 
 ```ruby
 app = Sliver::API.new do |api|
-  #Endpoints can be namespaced by a path - for example, a version.
-  api.path = '/v1'
-
   # GET /v1/
   api.connect :get, '/', lambda { |environment|
     [200, {}, ['How dare the Premier ignore my invitations?']]
