@@ -28,6 +28,20 @@ class AdditionAction
   end
 end
 
+class SkippedAction
+  include Sliver::Action
+
+  def skip?
+    response.status = 400
+    response.body   = ['Invalid']
+  end
+
+  def call
+    response.status = 200
+    response.body   = ['Success']
+  end
+end
+
 describe 'Class-based Sliver API' do
   include Rack::Test::Methods
 
@@ -35,6 +49,7 @@ describe 'Class-based Sliver API' do
     api.connect :get, '/',         GetAction
     api.connect :put, '/echo',     EchoAction
     api.connect :get, '/addition', AdditionAction
+    api.connect :get, '/skip',     SkippedAction
   end }
 
   it 'constructs responses' do
@@ -55,5 +70,12 @@ describe 'Class-based Sliver API' do
     get '/addition', 'a' => '5', 'b' => '3'
 
     expect(last_response.body).to eq('8')
+  end
+
+  it 'allows standard responses to be skipped' do
+    get '/skip'
+
+    expect(last_response.status).to eq(400)
+    expect(last_response.body).to eq('Invalid')
   end
 end

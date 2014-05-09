@@ -6,7 +6,9 @@ module Sliver::Action
   module ClassMethods
     def call(environment)
       response = Sliver::Response.new
-      new(environment, response).call
+
+      action = new(environment, response)
+      action.call unless action.skip?
 
       response.to_a
     end
@@ -14,6 +16,10 @@ module Sliver::Action
 
   def initialize(environment, response)
     @environment, @response = environment, response
+  end
+
+  def skip?
+    false
   end
 
   private
