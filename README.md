@@ -42,6 +42,18 @@ end
 class ChangeAction
   include Sliver::Action
 
+  # You don't *need* to implement this method - the underlying implementation
+  # returns false.
+  def skip?
+    return false unless environment['user'].nil?
+
+    # In this case, the call method is never invoked.
+    response.status = 401
+    response.body   = ['Unauthorised']
+
+    true
+  end
+
   def call
     # Change the status:
     response.status = 404
