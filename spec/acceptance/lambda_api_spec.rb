@@ -29,6 +29,12 @@ describe 'Basic Sliver API' do
     expect(last_response.body).to eq('foo')
   end
 
+  it 'matches empty paths as /' do
+    get ''
+
+    expect(last_response.body).to eq('foo')
+  end
+
   it 'delegates to the appropriate endpoint' do
     get '/bar'
 
