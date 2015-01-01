@@ -10,8 +10,12 @@ class Sliver::API
   def call(environment)
     method   = environment['REQUEST_METHOD']
     path     = environment['PATH_INFO']
-    endpoint = endpoints[method].find(path) || NOT_FOUND
+    endpoint = endpoints[method].find(path)
 
+    endpoint.nil? ? NOT_FOUND.call(environment) : invoke(endpoint, environment)
+  end
+
+  def invoke(endpoint, environment)
     endpoint.call environment
   end
 
