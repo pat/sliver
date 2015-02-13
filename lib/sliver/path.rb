@@ -4,7 +4,7 @@ class Sliver::Path
   end
 
   def matches?(path)
-    string.is_a?(String) ? (string == path) : path[/\A#{string}\z/]
+    path[/\A#{string}\z/]
   end
 
   private
