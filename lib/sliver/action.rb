@@ -5,18 +5,7 @@ module Sliver::Action
 
   module ClassMethods
     def call(environment)
-      response = Sliver::Response.new
-
-      action = new(environment, response)
-
-      guards.each do |guard_class|
-        guard = guard_class.new(action)
-        return guard.response unless guard.continue?
-      end
-
-      action.call unless action.skip?
-
-      response.to_a
+      Sliver::Runner.new(self, environment).call
     end
 
     def guards
