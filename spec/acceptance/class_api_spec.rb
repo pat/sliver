@@ -42,6 +42,43 @@ class SkippedAction
   end
 end
 
+class MyParamGuard
+  def initialize(action)
+    @action = action
+  end
+
+  def continue?
+    action.request.params['hello'] == 'world'
+  end
+
+  def response
+    [404, {}, ['Not Found']]
+  end
+
+  private
+
+  attr_reader :action
+end
+
+class GuardedAction
+  include Sliver::Action
+
+  def self.guards
+    [MyParamGuard]
+  end
+
+  def call
+    response.status = 200
+    response.body   = ['Welcome']
+  end
+end
+
+class UnguardedAction < GuardedAction
+  def self.guards
+    super - [MyParamGuard]
+  end
+end
+
 describe 'Class-based Sliver API' do
   include Rack::Test::Methods
 
@@ -50,6 +87,8 @@ describe 'Class-based Sliver API' do
     api.connect :put, '/echo',     EchoAction
     api.connect :get, '/addition', AdditionAction
     api.connect :get, '/skip',     SkippedAction
+    api.connect :get, '/guard',    GuardedAction
+    api.connect :get, '/unguard',  UnguardedAction
   end }
 
   it 'constructs responses' do
@@ -77,5 +116,26 @@ describe 'Class-based Sliver API' do
 
     expect(last_response.status).to eq(400)
     expect(last_response.body).to eq('Invalid')
+  end
+
+  it 'blocks guarded actions if they cannot continue' do
+    get '/guard'
+
+    expect(last_response.status).to eq(404)
+    expect(last_response.body).to eq('Not Found')
+  end
+
+  it 'accepts guarded actions that meet criteria' do
+    get '/guard', 'hello' => 'world'
+
+    expect(last_response.status).to eq(200)
+    expect(last_response.body).to eq('Welcome')
+  end
+
+  it 'respects subclass guard changes' do
+    get '/unguard'
+
+    expect(last_response.status).to eq(200)
+    expect(last_response.body).to eq('Welcome')
   end
 end
