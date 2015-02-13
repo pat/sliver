@@ -12,9 +12,7 @@ class Sliver::Endpoints
   def find(path)
     path = '/' if path == ''
 
-    key = paths.keys.detect { |key|
-      key.is_a?(String) ? (key == path) : path[/\A#{key}\z/]
-    }
+    key = paths.keys.detect { |key| key.matches?(path) }
 
     key && paths[key]
   end

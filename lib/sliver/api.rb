@@ -22,7 +22,7 @@ class Sliver::API
   def connect(method, path, action)
     method = method.to_s.upcase
 
-    endpoints[method].append path, action
+    endpoints[method].append Sliver::Path.new(path), action
   end
 
   private
