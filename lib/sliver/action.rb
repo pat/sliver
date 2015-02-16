@@ -28,4 +28,8 @@ module Sliver::Action
   private
 
   attr_reader :environment, :response
+
+  def path_params
+    @path_params ||= environment['sliver.path'].to_params environment
+  end
 end

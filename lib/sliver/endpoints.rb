@@ -4,17 +4,15 @@ class Sliver::Endpoints
   end
 
   def append(path, action)
-    path = '/' if path == ''
-
     paths[path] = action
   end
 
-  def find(path)
-    path = '/' if path == ''
+  def find(environment)
+    key = paths.keys.detect { |key| key.matches?(environment) }
+    return nil unless key
 
-    key = paths.keys.detect { |key| key.matches?(path) }
-
-    key && paths[key]
+    environment['sliver.path'] = key
+    paths[key]
   end
 
   private

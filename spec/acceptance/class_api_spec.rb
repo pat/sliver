@@ -79,6 +79,24 @@ class UnguardedAction < GuardedAction
   end
 end
 
+class IdAction
+  include Sliver::Action
+
+  def call
+    response.status = 200
+    response.body = [path_params['id']]
+  end
+end
+
+class MultiPathPartAction
+  include Sliver::Action
+
+  def call
+    response.status = 200
+    response.body = ["#{path_params['first']}:#{path_params['second']}"]
+  end
+end
+
 describe 'Class-based Sliver API' do
   include Rack::Test::Methods
 
@@ -89,6 +107,8 @@ describe 'Class-based Sliver API' do
     api.connect :get, '/skip',     SkippedAction
     api.connect :get, '/guard',    GuardedAction
     api.connect :get, '/unguard',  UnguardedAction
+    api.connect :get, '/my/:id',   IdAction
+    api.connect :get, '/my/:first/:second', MultiPathPartAction
   end }
 
   it 'constructs responses' do
@@ -137,5 +157,19 @@ describe 'Class-based Sliver API' do
 
     expect(last_response.status).to eq(200)
     expect(last_response.body).to eq('Welcome')
+  end
+
+  it 'handles path parameter markers' do
+    get '/my/10'
+
+    expect(last_response.status).to eq(200)
+    expect(last_response.body).to eq('10')
+  end
+
+  it 'handles multiple path parameter markers' do
+    get '/my/10/foo'
+
+    expect(last_response.status).to eq(200)
+    expect(last_response.body).to eq('10:foo')
   end
 end
