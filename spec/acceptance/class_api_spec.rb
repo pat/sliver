@@ -42,22 +42,15 @@ class SkippedAction
   end
 end
 
-class MyParamGuard
-  def initialize(action)
-    @action = action
-  end
-
+class MyParamGuard < Sliver::Hook
   def continue?
     action.request.params['hello'] == 'world'
   end
 
-  def response
-    [404, {}, ['Not Found']]
+  def respond
+    response.status = 404
+    response.body   = ['Not Found']
   end
-
-  private
-
-  attr_reader :action
 end
 
 class GuardedAction
@@ -97,6 +90,25 @@ class MultiPathPartAction
   end
 end
 
+class JsonProcessor < Sliver::Hook
+  def call
+    response.headers['Content-Type'] = 'application/json'
+  end
+end
+
+class ProcessedAction
+  include Sliver::Action
+
+  def self.processors
+    [JsonProcessor]
+  end
+
+  def call
+    response.status = 200
+    response.body   = ['[]']
+  end
+end
+
 describe 'Class-based Sliver API' do
   include Rack::Test::Methods
 
@@ -109,6 +121,7 @@ describe 'Class-based Sliver API' do
     api.connect :get, '/unguard',  UnguardedAction
     api.connect :get, '/my/:id',   IdAction
     api.connect :get, '/my/:first/:second', MultiPathPartAction
+    api.connect :get, '/processed', ProcessedAction
   end }
 
   it 'constructs responses' do
@@ -171,5 +184,12 @@ describe 'Class-based Sliver API' do
 
     expect(last_response.status).to eq(200)
     expect(last_response.body).to eq('10:foo')
+  end
+
+  it 'handles processors' do
+    get '/processed'
+
+    expect(last_response.status).to eq(200)
+    expect(last_response.headers['Content-Type']).to eq('application/json')
   end
 end

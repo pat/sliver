@@ -1,15 +1,14 @@
 class Sliver::Runner
   def initialize(klass, environment)
     @klass, @environment = klass, environment
+
+    @guarded = false
   end
 
   def call
-    guard_classes.each do |guard_class|
-      guard = guard_class.new(action)
-      return guard.response unless guard.continue?
-    end
-
-    action.call unless action.skip?
+    pass_guards
+    action.call unless skip_action?
+    post_process
 
     response.to_a
   end
@@ -26,7 +25,37 @@ class Sliver::Runner
     klass.guards
   end
 
+  def guarded?
+    @guarded
+  end
+
+  def guarded!
+    @guarded = true
+  end
+
+  def pass_guards
+    guard_classes.each do |guard_class|
+      guard = guard_class.new action, response
+      next if guard.continue?
+
+      guard.respond
+      guarded!
+    end
+  end
+
+  def post_process
+    processors.each { |processor| processor.call }
+  end
+
+  def processors
+    klass.processors.collect { |klass| klass.new action, response }
+  end
+
   def response
     @response ||= Sliver::Response.new
+  end
+
+  def skip_action?
+    guarded? || action.skip?
   end
 end

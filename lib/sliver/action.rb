@@ -11,6 +11,10 @@ module Sliver::Action
     def guards
       []
     end
+
+    def processors
+      []
+    end
   end
 
   def initialize(environment, response)
