@@ -15,12 +15,12 @@ class Sliver::Path
     return {} unless matches?(environment)
 
     path   = normalised_path environment['PATH_INFO']
-    keys   = string.to_s.scan(/:([\w-]+)/i).flatten
     values = path.scan(string_to_regexp).flatten
-    hash   = {}
 
-    keys.each_with_index { |key, index| hash[key] = values[index] }
-    hash
+    string_keys.each_with_index.inject({}) do |hash, (key, index)|
+      hash[key] = values[index]
+      hash
+    end
   end
 
   private
@@ -29,6 +29,10 @@ class Sliver::Path
 
   def normalised_path(string)
     string == '' ? '/' : string
+  end
+
+  def string_keys
+    @string_keys ||= string.to_s.scan(/:([\w-]+)/i).flatten
   end
 
   def string_to_regexp
