@@ -13,7 +13,7 @@ Early days of development, so things may change dramatically. Or not. Who knows.
 Add it to your Gemfile like any other gem, or install it manually.
 
 ```ruby
-gem 'sliver', '~> 0.0.5'
+gem 'sliver', '~> 0.1.0'
 ```
 
 ## Usage
@@ -26,8 +26,8 @@ array with three items: status code, headers, and body).
 So, a response can be as simple as a lambda/proc, or it can be a complex class.
 If you want to deal with classes, you can mix in `Sliver::Action` to take
 advantage of some helper methods (and it already stores environment via
-`attr_reader`), and it returns a `Sliver::Response` class which is translated to
-the standard Rack response. Each instance of a class that mixes in
+`attr_reader`), and it returns a `Sliver::Response` class which is translated
+to the standard Rack response. Each instance of a class that mixes in
 `Sliver::Action` is handling a specific API request.
 
 ```ruby
