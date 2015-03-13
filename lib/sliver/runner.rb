@@ -40,6 +40,7 @@ class Sliver::Runner
 
       guard.respond
       guarded!
+      break
     end
   end
 
