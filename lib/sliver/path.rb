@@ -1,7 +1,17 @@
 class Sliver::Path
+  attr_reader :http_method, :string
+
   def initialize(http_method, string)
     @http_method = http_method.to_s.upcase
     @string      = normalised_path string
+  end
+
+  def eql?(other)
+    http_method == other.http_method && string == other.string
+  end
+
+  def hash
+    "#{http_method} #{string}".hash
   end
 
   def matches?(environment)
@@ -24,8 +34,6 @@ class Sliver::Path
   end
 
   private
-
-  attr_reader :http_method, :string
 
   def normalised_path(string)
     string == '' ? '/' : string
