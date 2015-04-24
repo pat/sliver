@@ -13,7 +13,7 @@ Early days of development, so things may change dramatically. Or not. Who knows.
 Add it to your Gemfile like any other gem, or install it manually.
 
 ```ruby
-gem 'sliver', '~> 0.2.0'
+gem 'sliver', '~> 0.2.1'
 ```
 
 ## Usage
