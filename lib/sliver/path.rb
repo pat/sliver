@@ -45,7 +45,7 @@ class Sliver::Path
 
   def string_to_regexp
     @string_to_regexp ||= Regexp.new(
-      "\\A" + string.to_s.gsub(/:[\w-]+/, "([\\w-]+)") + "\\z"
+      "\\A" + string.to_s.gsub(/:[\w-]+/, "([\\w\\-\\.]+)") + "\\z"
     )
   end
 end
