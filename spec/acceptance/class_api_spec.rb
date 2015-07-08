@@ -179,6 +179,20 @@ describe 'Class-based Sliver API' do
     expect(last_response.body).to eq('10')
   end
 
+  it 'handles path parameters with full stops' do
+    get '/my/10.1'
+
+    expect(last_response.status).to eq(200)
+    expect(last_response.body).to eq('10.1')
+  end
+
+  it 'handles path parameters with pluses' do
+    get '/my/10+1'
+
+    expect(last_response.status).to eq(200)
+    expect(last_response.body).to eq('10+1')
+  end
+
   it 'handles multiple path parameter markers' do
     get '/my/10/foo'
 
