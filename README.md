@@ -6,7 +6,14 @@ A super simple, extendable Rack API.
 [![Code Climate](https://codeclimate.com/github/pat/sliver.png)](https://codeclimate.com/github/pat/sliver)
 [![Gem Version](https://badge.fury.io/rb/sliver.svg)](http://badge.fury.io/rb/sliver)
 
-Early days of development, so things may change dramatically. Or not. Who knows.
+## Why?
+
+Ruby doesn't lack for web frameworks, especially ones focused on APIs, but Sliver is a little different from others I've come across.
+
+* It focuses on one class per endpoint, for increased Single Responsibility Principle friendliness.
+* Separate classes allows for better code organisation, instead of everything in one file.
+* It's a pretty small layer on top of Rack, which is the only dependency, which keeps things light and fast.
+* Guards and processors provide some structures for managing authentication, JSON responses and other common behaviours across actions (similar to Rails before_action filters).
 
 ## Installation
 
@@ -18,45 +25,42 @@ gem 'sliver', '~> 0.2.2'
 
 ## Usage
 
-Create a new API (a Rack app, of course), and specify paths with corresponding
-responses. Responses can be anything that responds to `call` with a single
-argument (the request environment) and returns a standard Rack response (an
-array with three items: status code, headers, and body).
+At its most basic level, Sliver is a simple routing engine to other Rack endpoints. You can map out a bunch of routes (with the HTTP method and the path), and the corresponding endpoints for requests that come in on those routes.
 
-So, a response can be as simple as a lambda/proc, or it can be a complex class.
-If you want to deal with classes, you can mix in `Sliver::Action` to take
-advantage of some helper methods (and it already stores environment via
-`attr_reader`), and it returns a `Sliver::Response` class which is translated
-to the standard Rack response. Each instance of a class that mixes in
-`Sliver::Action` is handling a specific API request.
+### Lambda Endpoints
+
+Here's an example using lambdas, where the responses must match Rack's expected output (an array with three items: status code, headers, and body).
 
 ```ruby
 app = Sliver::API.new do |api|
-  # GET /v1/
   api.connect :get, '/', lambda { |environment|
     [200, {}, ['How dare the Premier ignore my invitations?']]
   }
 
-  # PUT /v1/change
-  api.connect :put, '/change', ChangeAction
+  api.connect :post '/hits', lambda { |environment|
+    HitMachine.create! Rack::Request.new(environment).params[:hit]
+
+    [200, {}, ["He'll have to go!"]]
+  }
+end
+```
+
+### Sliver::Action Endpoints
+
+However, it can be nice to encapsulate each endpoint in its own class - to keep responsibilities clean and concise. Sliver provides a module `Sliver::Action` which makes this approach reasonably simple, with helper methods to the Rack environment and a `response` object, which can have `status`, `headers` and `body` set (which is automatically translated into the Rack response).
+
+```ruby
+app = Sliver::API.new do |api|
+  api.connect :get, '/changes', ChangesAction
 end
 
-class ChangeAction
+class ChangesAction
   include Sliver::Action
 
-  # You don't *need* to implement this method - the underlying implementation
-  # returns false.
-  def skip?
-    return false unless environment['user'].nil?
-
-    # In this case, the call method is never invoked.
-    response.status = 401
-    response.body   = ['Unauthorised']
-
-    true
-  end
-
   def call
+    # This isn't a realistic implementation - just examples of how
+    # to interact with the provided variables.
+
     # Change the status:
     response.status = 404
 
@@ -80,29 +84,154 @@ class ChangeAction
 end
 ```
 
-If you want all responses to API requests to share some behaviour - say, for
-example, you are always returning JSON - then you can create your own base class
-for this purpose:
+### Path Parameters
+
+Much like Rails, you can have named parameters in your paths, which are available via `path_params` within your endpoint behaviour:
 
 ```ruby
-class JSONAction
+app = Sliver::API.new do |api|
+  api.connect :get, '/changes/:id', ChangeAction
+end
+
+class ChangeAction
   include Sliver::Action
 
   def call
-    response.headers['Content-Type'] = 'application/json'
-    response.body = [JSON.generate(response.body)]
-  end
-end
+    change = Change.find path_params['id']
 
-class ChangeAction < JSONAction
-  def call
     response.status = 200
-    response.body   = {'status' => 'OK'}
-
-    super
+    response.body   = ["Change: #{change.name}"]
   end
 end
 ```
+
+It's worth noting that unlike Rails, these values are not mixed into the standard `params` hash.
+
+### Guards
+
+Sometimes you're going to have endpoints where you want to check certain things before getting into the core implementation: one example could be to check whether the request is made by an authenticated user. In Sliver, you can do this via Guards:
+
+```ruby
+app = Sliver::API.new do |api|
+  api.connect :get, '/changes/:id', ChangeAction
+end
+
+class ChangeAction
+  include Sliver::Action
+
+  def self.guards
+    [AuthenticatedUserGuard]
+  end
+
+  def call
+    change = Change.find path_params['id']
+
+    response.status = 200
+    response.body   = ["Change: #{change.name}"]
+  end
+
+  def user
+    @user ||= User.find_by :key => request.env['Authentication']
+  end
+end
+
+class AuthenticatedUserGuard < Sliver::Hook
+  def continue?
+    action.user.present?
+  end
+
+  def respond
+    response.status = 401
+    response.body   = ['Unauthorised: valid session is required']
+  end
+end
+```
+
+Guards inheriting from `Sliver::Hook` just need to respond to `call`, and have access to `action` (your endpoint instance) and `response` (which will be turned into a proper Rack response).
+
+They are set in the action via a class method (which must return an array of classes), and a guard instance must respond to two methods: `continue?` and `respond`. If `continue?` returns true, then the main action `call` method is used. Otherwise, it's skipped, and the guard's `respond` method needs to set the alternative response.
+
+### Processors
+
+Processors are behaviours that happen after the endpoint logic has been performed. These are particularly useful for transforming the response, perhaps to JSON if your API is expected to always return JSON:
+
+```ruby
+app = Sliver::API.new do |api|
+  api.connect :get, '/changes/:id', ChangeAction
+end
+
+class ChangeAction
+  include Sliver::Action
+
+  def self.processors
+    [JSONProcessor]
+  end
+
+  def call
+    change = Change.find path_params['id']
+
+    response.status = 200
+    response.body   = {:id => change.id, :name => change.name}
+  end
+end
+
+class JSONProcessor < Sliver::Hook
+  def call
+    response.body                    = [JSON.generate(response.body)]
+    response.headers['Content-Type'] = 'application/json'
+  end
+end
+```
+
+Processors inheriting from `Sliver::Hook` just need to respond to `call`, and have access to `action` (your endpoint instance) and `response` (which will be turned into a proper Rack response).
+
+### Testing
+
+Because your API is a Rack app, it can be tested using `rack-test`'s helper methods. Here's a quick example for RSpec:
+
+```ruby
+describe 'My API' do
+  include Rack::Test::Methods
+
+  let(:app) { MyApi.new }
+
+  it 'responds to GET requests' do
+    get '/'
+
+    expect(last_response.status).to eq(200)
+    expect(last_response.headers['Content-Type']).to eq('text/plain')
+    expect(last_response.body).to eq('foo')
+  end
+end
+```
+
+### Running via config.ru
+
+It's pretty easy to run your Sliver API via a `config.ru` file:
+
+```ruby
+require 'rubygems'
+require 'bundler'
+
+Bundler.setup :default
+$:.unshift File.dirname(__FILE__) + '/lib'
+
+require 'my_app'
+
+run MyApp::API.new
+```
+
+### Running via Rails
+
+Of course, you can also run your API within the context of Rails by mounting it in your `config/routes.rb` file:
+
+```ruby
+MyRailsApp::Application.routes.draw do
+  mount Api::V1.new => '/api/v1'
+end
+```
+
+There is also the [sliver-rails](https://github.com/pat/sliver-rails) gem which adds some nice extensions to Sliver with Rails in mind.
 
 ## Contributing
 
@@ -116,5 +245,5 @@ Please note that this project now has a [Contributor Code of Conduct](http://con
 
 ## Licence
 
-Copyright (c) 2014, Sliver is developed and maintained by Pat Allan, and is
+Copyright (c) 2014-2015, Sliver is developed and maintained by Pat Allan, and is
 released under the open MIT Licence.
