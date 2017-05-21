@@ -52,6 +52,7 @@ describe 'Basic Sliver API' do
 
     expect(last_response.status).to eq(404)
     expect(last_response.body).to eq('Not Found')
+    expect(last_response.headers['X-Cascade']).to eq('pass')
   end
 
   it 'matches against regular expressions' do
