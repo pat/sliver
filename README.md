@@ -20,7 +20,7 @@ Ruby doesn't lack for web frameworks, especially ones focused on APIs, but Slive
 Add it to your Gemfile like any other gem, or install it manually.
 
 ```ruby
-gem 'sliver', '~> 0.2.2'
+gem 'sliver', '~> 0.2.3'
 ```
 
 ## Usage
