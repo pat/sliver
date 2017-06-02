@@ -45,11 +45,7 @@ class Sliver::Runner
   end
 
   def post_process
-    processors.each { |processor| processor.call }
-  end
-
-  def processors
-    klass.processors.collect { |klass| klass.new action, response }
+    klass.processors.each { |processor| processor.call action, response }
   end
 
   def response
