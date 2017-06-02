@@ -11,7 +11,7 @@ class Sliver::Endpoints
     key = paths.keys.detect { |key| key.matches?(environment) }
     return nil unless key
 
-    environment['sliver.path'] = key
+    environment[Sliver::PATH_KEY] = key
     paths[key]
   end
 

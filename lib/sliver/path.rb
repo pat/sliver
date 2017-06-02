@@ -1,4 +1,9 @@
 class Sliver::Path
+  METHOD_KEY = "REQUEST_METHOD".freeze
+  PATH_KEY   = "PATH_INFO".freeze
+  EMPTY_PATH = "".freeze
+  ROOT_PATH  = "/".freeze
+
   attr_reader :http_method, :string
 
   def initialize(http_method, string)
@@ -11,12 +16,12 @@ class Sliver::Path
   end
 
   def hash
-    "#{http_method} #{string}".hash
+    @hash ||= "#{http_method} #{string}".hash
   end
 
   def matches?(environment)
-    method = environment['REQUEST_METHOD']
-    path   = normalised_path environment['PATH_INFO']
+    method = environment[METHOD_KEY]
+    path   = normalised_path environment[PATH_KEY]
 
     http_method == method && path[string_to_regexp]
   end
@@ -24,7 +29,7 @@ class Sliver::Path
   def to_params(environment)
     return {} unless matches?(environment)
 
-    path   = normalised_path environment['PATH_INFO']
+    path   = normalised_path environment[PATH_KEY]
     values = path.scan(string_to_regexp).flatten
 
     string_keys.each_with_index.inject({}) do |hash, (key, index)|
@@ -36,7 +41,7 @@ class Sliver::Path
   private
 
   def normalised_path(string)
-    string == '' ? '/' : string
+    string == EMPTY_PATH ? ROOT_PATH : string
   end
 
   def string_keys

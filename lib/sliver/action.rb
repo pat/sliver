@@ -34,6 +34,6 @@ module Sliver::Action
   attr_reader :environment, :response
 
   def path_params
-    @path_params ||= environment['sliver.path'].to_params environment
+    @path_params ||= environment[Sliver::PATH_KEY].to_params environment
   end
 end

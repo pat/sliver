@@ -1,5 +1,5 @@
 module Sliver
-  #
+  PATH_KEY = "sliver.path".freeze
 end
 
 require 'sliver/action'
