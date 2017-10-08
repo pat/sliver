@@ -18,6 +18,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "rack", ">= 1.5.2"
 
   spec.add_development_dependency "rack-test", ">= 0.6.2"
+  spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec",     ">= 3.6.0"
   spec.add_development_dependency "rubocop",   "~> 0.50.0"
 end

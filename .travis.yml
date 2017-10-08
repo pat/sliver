@@ -1,7 +1,7 @@
 language: ruby
 before_script:
 - if (ruby -e "exit RUBY_VERSION.to_f >= 2.4"); then export RUBYOPT="--enable-frozen-string-literal"; fi; echo $RUBYOPT
-script: bundle exec rspec spec
+script: bundle exec rake
 cache: bundler
 rvm:
   - 2.2
