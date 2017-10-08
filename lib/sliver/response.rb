@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Sliver::Response
   attr_accessor :status, :headers, :body
 

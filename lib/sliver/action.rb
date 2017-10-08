@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Sliver::Action
   def self.included(base)
     base.extend Sliver::Action::ClassMethods

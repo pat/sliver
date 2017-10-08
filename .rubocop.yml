@@ -9,3 +9,6 @@ Style/ClassAndModuleChildren:
 
 Style/Documentation:
   Enabled: false
+
+Style/RedundantFreeze:
+  Enabled: false

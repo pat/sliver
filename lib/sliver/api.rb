@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Sliver::API
   NOT_FOUND = [404, {"X-Cascade" => "pass"}, ["Not Found"]].freeze
 

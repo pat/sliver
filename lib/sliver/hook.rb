@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Sliver::Hook
   def self.call(action, response)
     new(action, response).call

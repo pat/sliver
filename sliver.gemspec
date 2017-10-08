@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Gem::Specification.new do |spec|
   spec.name          = "sliver"
   spec.version       = "0.2.4"

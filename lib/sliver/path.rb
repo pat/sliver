@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Sliver::Path
   METHOD_KEY = "REQUEST_METHOD".freeze
   PATH_KEY   = "PATH_INFO".freeze

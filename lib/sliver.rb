@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Sliver
   PATH_KEY = "sliver.path".freeze
 end

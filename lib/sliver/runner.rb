@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Sliver::Runner
   def initialize(klass, environment)
     @klass       = klass
