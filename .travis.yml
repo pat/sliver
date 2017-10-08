@@ -5,6 +5,6 @@ script: bundle exec rake
 cache: bundler
 rvm:
   - 2.2
-  - 2.3.4
-  - 2.4.1
+  - 2.3.5
+  - 2.4.2
   - jruby-9.1.10.0
