@@ -8,11 +8,11 @@ class Sliver::Endpoints
   end
 
   def find(environment)
-    key = paths.keys.detect { |key| key.matches?(environment) }
-    return nil unless key
+    path = paths.keys.detect { |key| key.matches?(environment) }
+    return nil unless path
 
-    environment[Sliver::PATH_KEY] = key
-    paths[key]
+    environment[Sliver::PATH_KEY] = path
+    paths[path]
   end
 
   private

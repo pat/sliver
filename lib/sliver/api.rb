@@ -1,5 +1,5 @@
 class Sliver::API
-  NOT_FOUND = [404, {'X-Cascade' => 'pass'}, ['Not Found']].freeze
+  NOT_FOUND = [404, {"X-Cascade" => "pass"}, ["Not Found"]].freeze
 
   def initialize(&block)
     @endpoints = Sliver::Endpoints.new

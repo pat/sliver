@@ -4,7 +4,8 @@ class Sliver::Hook
   end
 
   def initialize(action, response)
-    @action, @response = action, response
+    @action   = action
+    @response = response
   end
 
   private

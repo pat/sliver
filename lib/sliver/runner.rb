@@ -1,6 +1,7 @@
 class Sliver::Runner
   def initialize(klass, environment)
-    @klass, @environment = klass, environment
+    @klass       = klass
+    @environment = environment
 
     @guarded = false
   end

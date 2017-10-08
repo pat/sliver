@@ -18,7 +18,8 @@ module Sliver::Action
   end
 
   def initialize(environment, response)
-    @environment, @response = environment, response
+    @environment = environment
+    @response    = response
   end
 
   def request
