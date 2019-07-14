@@ -3,7 +3,7 @@
 A super simple, extendable Rack API.
 
 [![Build Status](https://travis-ci.org/pat/sliver.svg?branch=master)](https://travis-ci.org/pat/sliver)
-[![Code Climate](https://codeclimate.com/github/pat/sliver.png)](https://codeclimate.com/github/pat/sliver)
+[![Code Climate](https://codeclimate.com/github/pat/sliver.svg)](https://codeclimate.com/github/pat/sliver)
 [![Gem Version](https://badge.fury.io/rb/sliver.svg)](http://badge.fury.io/rb/sliver)
 
 ## Why?
